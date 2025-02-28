@@ -1,0 +1,27 @@
+{
+  "name": "sqlite-tags",
+  "version": "0.0.1",
+  "description": "Add template tags to node:sqlite",
+  "main": "sqlite-tags.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcollina/node-sqlite-tags.git"
+  },
+  "keywords": [
+    "sqlite",
+    "node",
+    "node:sqlite",
+    "template",
+    "tags",
+    "templatetags"
+  ],
+  "author": "Matteo Collina <hello@matteocollina.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mcollina/node-sqlite-tags/issues"
+  },
+  "homepage": "https://github.com/mcollina/node-sqlite-tags#readme"
+}
