@@ -18,12 +18,12 @@ const DEFAULT_CACHE_SIZE = 100
  * @param {number} [options.cacheSize=100] - Maximum number of prepared statements to cache
  * @returns {Function} A template tag function for SQL queries
  */
-function createQueryTag(db, options = {}) {
+function createQueryTag (db, options = {}) {
   const cacheSize = options.cacheSize || DEFAULT_CACHE_SIZE
-  
+
   // Create an LRU cache for prepared statements
   const stmtCache = new mnemonist.LRUCache(cacheSize)
-  
+
   /**
    * Tagged template function for SQL queries
    *
@@ -31,14 +31,14 @@ function createQueryTag(db, options = {}) {
    * @param {...any} values - Values to be inserted into the query
    * @returns {Array<object>} Query results
    */
-  function query(strings, ...values) {
+  function query (strings, ...values) {
     // Construct the SQL query
     const sql = strings.reduce((acc, str, i) => {
       return acc + str + (i < values.length ? '?' : '')
     }, '')
-    
+
     let stmt
-    
+
     // Try to get the prepared statement from the cache
     if (stmtCache.has(sql)) {
       stmt = stmtCache.get(sql)
@@ -47,13 +47,13 @@ function createQueryTag(db, options = {}) {
       stmt = db.prepare(sql)
       stmtCache.set(sql, stmt)
     }
-    
+
     try {
       // Bind all parameters if we have any
       if (values.length > 0) {
         return stmt.all(...values)
       }
-      
+
       return stmt.all()
     } catch (err) {
       // If an error occurs, remove the statement from the cache
@@ -62,30 +62,30 @@ function createQueryTag(db, options = {}) {
       throw err
     }
   }
-  
+
   /**
    * Clears the statement cache
    */
-  query.clearCache = function clearCache() {
+  query.clearCache = function clearCache () {
     stmtCache.clear()
   }
-  
+
   /**
    * Returns the current size of the statement cache
    * @returns {number} Current cache size
    */
-  query.cacheSize = function cacheSize() {
+  query.cacheSize = function cacheSize () {
     return stmtCache.size
   }
-  
+
   /**
    * Returns the maximum capacity of the statement cache
    * @returns {number} Maximum cache capacity
    */
-  query.cacheCapacity = function cacheCapacity() {
+  query.cacheCapacity = function cacheCapacity () {
     return stmtCache.capacity
   }
-  
+
   return query
 }
 
@@ -97,7 +97,7 @@ function createQueryTag(db, options = {}) {
  * @param {number} [options.cacheSize=100] - Maximum number of prepared statements to cache
  * @returns {sqlite.DatabaseSync} Enhanced database with query tag method
  */
-function addQueryTag(db, options = {}) {
+function addQueryTag (db, options = {}) {
   // Add the query tagged template method to the database instance
   db.query = createQueryTag(db, options)
   return db
@@ -111,10 +111,10 @@ function addQueryTag(db, options = {}) {
  * @param {number} [options.cacheSize=100] - Maximum number of prepared statements to cache
  * @returns {sqlite.DatabaseSync} Enhanced database with query tag
  */
-function open(path, options = {}) {
+function open (path, options = {}) {
   // Extract options for the database and for the query tag
   const { cacheSize, ...dbOptions } = options
-  
+
   const db = new sqlite.DatabaseSync(path, dbOptions)
   return addQueryTag(db, { cacheSize })
 }
