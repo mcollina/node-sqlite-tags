@@ -1,6 +1,6 @@
 {
   "name": "sqlite-tags",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Add template tags to node:sqlite",
   "main": "sqlite-tags.js",
   "scripts": {
