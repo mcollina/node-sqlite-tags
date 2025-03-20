@@ -4,7 +4,10 @@
   "description": "Add template tags to node:sqlite",
   "main": "sqlite-tags.js",
   "scripts": {
-    "test": "node --test"
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "test": "node --test",
+    "test:coverage": "node --experimental-test-coverage --test"
   },
   "repository": {
     "type": "git",
@@ -23,5 +26,9 @@
   "bugs": {
     "url": "https://github.com/mcollina/node-sqlite-tags/issues"
   },
-  "homepage": "https://github.com/mcollina/node-sqlite-tags#readme"
+  "homepage": "https://github.com/mcollina/node-sqlite-tags#readme",
+  "devDependencies": {
+    "eslint": "^9.22.0",
+    "neostandard": "^0.12.1"
+  }
 }
