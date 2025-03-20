@@ -1,6 +1,6 @@
 # node-sqlite-tags
 
-Add template tags to [node:sqlite](https://nodejs.org/api/sqlite.html) for convenient and safe SQL querying.
+Add template tags to [node:sqlite](https://nodejs.org/api/sqlite.html) for convenient and safe SQL querying with built-in LRU caching for prepared statements.
 
 ## Installation
 
@@ -38,9 +38,22 @@ const results = db.query`
   AND category = ${category}
 `
 
+// Check cache status
+console.log(`Cache size: ${db.query.cacheSize()}`)
+console.log(`Cache capacity: ${db.query.cacheCapacity()}`)
+
+// Clear the cache if needed
+db.query.clearCache()
+
 // Close the database when done
 db.close()
 ```
+
+## LRU Caching
+
+The module uses an LRU (Least Recently Used) cache to store prepared statements, which improves performance by reusing statements instead of re-preparing them for each query execution. This is especially useful for frequently executed queries.
+
+By default, the cache can store up to 100 prepared statements. You can customize this with the `cacheSize` option.
 
 ## API
 
@@ -49,14 +62,18 @@ db.close()
 Opens a SQLite database and adds the query tag functionality.
 
 - `filename`: String, URL, or Buffer - Path to the database file
-- `options`: Object - Options for opening the database (see [node:sqlite documentation](https://nodejs.org/api/sqlite.html))
+- `options`: Object - Options for opening the database and query tag
+  - `cacheSize`: Number - Maximum number of prepared statements to cache (default: 100)
+  - ... (and all other standard options from [node:sqlite](https://nodejs.org/api/sqlite.html))
 - Returns: DatabaseSync - Enhanced database with query tag method
 
-### `addQueryTag(db)`
+### `addQueryTag(db, options)`
 
 Adds the query tag functionality to an existing database instance.
 
 - `db`: DatabaseSync - An existing SQLite database instance
+- `options`: Object - Configuration options
+  - `cacheSize`: Number - Maximum number of prepared statements to cache (default: 100)
 - Returns: DatabaseSync - The same database object with added query tag functionality
 
 ### `db.query`
@@ -66,6 +83,18 @@ Tagged template function for SQL queries with automatic parameter binding.
 - Parameters are automatically extracted from the template and bound safely
 - Returns: Array<Object> - Query results as objects
 
+### `db.query.clearCache()`
+
+Clears the prepared statement cache.
+
+### `db.query.cacheSize()`
+
+Returns the current number of statements in the cache.
+
+### `db.query.cacheCapacity()`
+
+Returns the maximum capacity of the statement cache.
+
 ## Testing
 
 Run the tests with:
@@ -73,6 +102,16 @@ Run the tests with:
 ```sh
 npm test
 ```
+
+## Performance Impact
+
+Using the LRU cache for prepared statements can significantly improve performance in applications that:
+
+1. Execute the same queries repeatedly
+2. Have complex queries that are expensive to parse and prepare
+3. Execute queries in tight loops or high-frequency operations
+
+The cache helps avoid the overhead of re-parsing and preparing SQL statements, which can be substantial for complex queries.
 
 ## License
 
